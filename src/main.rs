@@ -33,6 +33,7 @@ async fn health() -> impl Responder {
 }
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+    println!("Server started");
     HttpServer::new(|| {
         App::new()
             .route("/", web::get().to(greet))
