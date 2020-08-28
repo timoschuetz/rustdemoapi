@@ -12,6 +12,22 @@ async fn check() -> impl Responder {
     format!("{:?} - {:?}", VERSION, hostname)
 }
 
+async fn tr_fib(req: HttpRequest) -> impl Responder {
+    let zahl :&str = req.match_info().get("zahl").unwrap_or("1");
+    let zahli :i32 = zahl.parse::<i32>().unwrap();
+    format!("Fibonacci zahl von {} ist {}", zahli, fibonacci(zahli as i128))
+}
+
+fn fibonacci(zahl: i128) -> i128 {
+    return if zahl == 1 || zahl == 2 {
+        1
+    } else if zahl > 0 {
+        fibonacci(zahl - 1) + fibonacci(zahl - 2)
+    } else {
+        0
+    }
+}
+
 async fn health() -> impl Responder {
     format!("Ok")
 }
@@ -23,8 +39,9 @@ async fn main() -> std::io::Result<()> {
             .route("/hostname", web::get().to(check))
             .route("/health", web::get().to(health))
             .route("/{name}", web::get().to(greet))
+            .route("/fibo/{zahl}", web::get().to(tr_fib))
     })
-        .bind("127.0.0.1:8000")?
+        .bind("0.0.0.0:8000")?
         .run()
         .await
 }
