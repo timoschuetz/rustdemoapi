@@ -1,6 +1,6 @@
 [package]
 name = "rustdemoapi"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Timo Schütz <mail@tschuetz.de>"]
 edition = "2018"
 

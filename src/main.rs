@@ -15,7 +15,9 @@ async fn check() -> impl Responder {
 async fn tr_fib(req: HttpRequest) -> impl Responder {
     let zahl :&str = req.match_info().get("zahl").unwrap_or("1");
     let zahli :i32 = zahl.parse::<i32>().unwrap();
-    format!("Fibonacci zahl von {} ist {}", zahli, fibonacci(zahli as i128))
+    let hostname = sys_info::hostname();
+    const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+    format!("Server: {:?} on {} - Fibonacci zahl von {} ist {}", hostname, VERSION, zahli, fibonacci(zahli as i128))
 }
 
 fn fibonacci(zahl: i128) -> i128 {
