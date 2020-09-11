@@ -1,4 +1,5 @@
 use actix_web::{web, App, HttpRequest, HttpServer, Responder};
+use std::collections::HashMap;
 extern crate sys_info;
 
 async fn greet(req: HttpRequest) -> impl Responder {
@@ -17,14 +18,25 @@ async fn tr_fib(req: HttpRequest) -> impl Responder {
     let zahli :i32 = zahl.parse::<i32>().unwrap();
     let hostname = sys_info::hostname();
     const VERSION: &'static str = env!("CARGO_PKG_VERSION");
-    format!("Server: {:?} on {} - Fibonacci zahl von {} ist {}", hostname, VERSION, zahli, fibonacci(zahli as i128))
+    let mut kv_map = HashMap::<i32, i128>::new();
+    format!("Server: {:?} on {} - Fibonacci Zahl von {} ist {}", hostname, VERSION, zahli, fibonacci(zahli, &mut kv_map))
 }
 
-fn fibonacci(zahl: i128) -> i128 {
+fn fibonacci(zahl: i32, kv_map: &mut HashMap<i32, i128>) -> i128 {
     return if zahl == 1 || zahl == 2 {
         1
     } else if zahl > 0 {
-        fibonacci(zahl - 1) + fibonacci(zahl - 2)
+            match kv_map.get(&zahl) {
+                Some(&number) => return number,
+                _ => {
+                        let res = fibonacci(zahl - 1, kv_map) + (fibonacci(zahl - 2, kv_map));
+                        // println!("{:?}", res);
+                        // println!("Before insert: {:?}", kv_map);
+                        kv_map.insert(zahl, res);
+                        // println!("After insert: {:?}", kv_map);
+                        return res;
+                },
+            };
     } else {
         0
     }
@@ -33,6 +45,7 @@ fn fibonacci(zahl: i128) -> i128 {
 async fn health() -> impl Responder {
     format!("Ok")
 }
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     println!("Server started");
